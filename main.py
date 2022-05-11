@@ -5,111 +5,56 @@ from numpy import random
 import numpy as np
 import array as arr
 
-size_matrix_task = 5  # Размер исходной матрицы
+class QAP:
+    def __init__(self, assignments, distances,
+                 flows):
+        self.A = np.matrix(assignments) # Матрица стоимости назначений
+        self.D = np.matrix(distances) # Матрица стоимости перевозки
+        self.F = np.matrix(flows) # Количество единиц ресурса
+        # IWO параметры
+        self.maxIt = 50  # Максимальное количество итераций
+        self.population_Size_Initial = 1  # Начальный размер популяции
+        self.maximum_Population_Size = 10  # Максимальная размер популяции
+        self.min_Seed = 0  # Минимальное количество семян
+        self.max_Seed = 5  # Максимальное количество семян
 
-# Матрица затрат С
-matrix_task = [[49, 74, 62, 80, 58],
-               [91, 73, 67, 32, 31],
-               [11, 85, 15, 8, 64],
-               [55, 41, 47, 15, 74],
-               [83, 87, 30, 13, 78]]
+        self.m = 2  # Показатель уменьшения дисперсии(m)
 
-# Оптимальное решение X
-x = [
-    [1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1],
-    [0, 0, 1, 0, 0],
-    [0, 1, 0, 0, 0],
-    [0, 0, 0, 1, 0]
-]
+        self.sigma_initial = 0.5  # Начальное значение стандартного отклонения
+        self.sigma_final = 0.001  # Конечное значение стандартного отклонения
 
+    def start(self):
 
-# Целевая функция
-def target_function(c, x):
-    result = 0  # Результат
+        # Генерируем исходную популяцию
+        initial_population = np.array([random.uniform(-1,1) for i in range(len(self.A))])
 
-    for i in range(len(c)):
-        for j in range(len(c)):
-            result += c[i][j] * x[i][j]
-
-    return result
+        print(initial_population)
+        indices = sorted(range(len(self.A)), key=lambda i: initial_population[i]) # Исходное решение
 
 
-# Вывод матриц
-def print_matrix(matrix):
-    for i in range(len(matrix)):
-        for j in range(len(matrix)):
-            print("{:4d}".format(matrix[i][j]), end="")
-        print()
 
-def mixing_matrix(matrix, row_or_column, pos1, pos2):
-    # Меняем строки
-    if (isinstance(matrix, tuple)):
-        matrix = tuple_in_matrix(matrix)
+    def target_function(self, p):
+        cost = 0
+        for i in range(len(p)):  # i - объект, site - расположение
+            cost += self.A[p[i], i]  # Находим сумма стоимости расположений объекта
 
-    size_matrix = size_matrix_task
+        # f(i,j)*d(pi,pj)
+        for i in range(1, len(p)):
+            for j in range(i):
+                cost += self.F[i, j] * self.D[p[i], p[j]]
 
-    if row_or_column == 0:
-        for i in range(size_matrix):
-            t = matrix[pos1][i]
-            matrix[pos1][i] = matrix[pos2][i]
-            matrix[pos2][i] = t
+        return cost
 
 
-    # Меняем столбцы
-    else:
-        for i in range(size_matrix):
-            t = matrix[i][pos1]
-            matrix[i][pos1] = matrix[i][pos2]
-            matrix[i][pos2] = t
-
-    return matrix
-
-# Из матрицы делаем кортеж
-def matrix_in_tuple(matrix):
-    a = []
-    for i in range(len(matrix)):
-        a.append([])
-        for j in range(len(matrix)):
-            a[i].append(matrix[i][j])
-
-    lis = list()
-    for i in range(0, len(a)):
-        for j in range(0, len(a)):
-            lis.append(a[i][j])
-
-    return tuple(lis)
 
 
-# Из картежа делаем матрицу
-def tuple_in_matrix(tuple):
-    matrix_list = list(tuple)  # Получаем список
-    k = 0
-    matrix = []
-    for i in range(size_matrix_task):
-        a = []
-        for j in range(size_matrix_task):
-            a.append(matrix_list[k])
-            k += 1
-        matrix.append(a)
 
-    return np.array(matrix)
 
 
 def iwo():
     # Размер матрицы задачи
 
-    # IWO параметры
-    maxIt = 50  # Максимальное количество итераций
-    population_Size_Initial = 2  # Начальный размер популяции
-    maximum_Population_Size = 10  # Максимальная размер популяции
-    min_Seed = 0  # Минимальное количество семян
-    max_Seed = 5  # Максимальное количество семян
 
-    m = 2  # Показатель уменьшения дисперсии(m)
-
-    sigma_initial = 0.5  # Начальное значение стандартного отклонения
-    sigma_final = 0.001  # Конечное значение стандартного отклонения
 
     # Инициализируем случайным образом минимальное количество сорняков для старта алгоритма
     # Заполняем 0 гиперпараллелепипед
@@ -216,8 +161,9 @@ def iwo():
 
 
 def main():
-    iwo()
-    return
+    qap = QAP([[9, 51, 3], [2, 4, 1], [6, 22, 7]],[[0, 70, 2], [7, 0, 43], [2, 41, 0]],[[0, 31, 6], [3, 0, 42], [6, 4, 0]])
+    qap.start()
+
 
 
 if __name__ == '__main__':
