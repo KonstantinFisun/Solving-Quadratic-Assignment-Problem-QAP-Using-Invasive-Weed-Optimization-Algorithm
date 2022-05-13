@@ -8,22 +8,23 @@ import array as arr
 
 class QAP:
     def __init__(self, distances,
-                 flows):
+                 flows, maxIt = 20, population_Size_Initial = 20,
+                 maximum_Population_Size = 20,min_Seed = 1, max_Seed = 3, m = 3, sigma_initial = 20, sigma_final = 0.5):
         # self.A = np.matrix(assignments) # Матрица стоимости назначений
         self.D = np.matrix(distances)  # Матрица стоимости перевозки
         self.F = np.matrix(flows)  # Количество единиц ресурса
         self.size = len(self.D)
         # IWO параметры
-        self.maxIt = 20  # Максимальное количество итераций
-        self.population_Size_Initial = 2000  # Начальный размер популяции
-        self.maximum_Population_Size = 20  # Максимальная размер популяции
-        self.min_Seed = 1  # Минимальное количество семян
-        self.max_Seed = 3  # Максимальное количество семян
+        self.maxIt = maxIt  # Максимальное количество итераций
+        self.population_Size_Initial = population_Size_Initial  # Начальный размер популяции
+        self.maximum_Population_Size = maximum_Population_Size  # Максимальная размер популяции
+        self.min_Seed = min_Seed  # Минимальное количество семян
+        self.max_Seed = max_Seed  # Максимальное количество семян
 
-        self.m = 3  # Показатель уменьшения дисперсии(m)
+        self.m = m  # Показатель уменьшения дисперсии(m)
 
-        self.sigma_initial = 20  # Начальное значение стандартного отклонения
-        self.sigma_final = 0.5  # Конечное значение стандартного отклонения
+        self.sigma_initial = sigma_initial  # Начальное значение стандартного отклонения
+        self.sigma_final = sigma_final  # Конечное значение стандартного отклонения
 
     # Целевая функция
     def target_function(self, p):
@@ -94,7 +95,9 @@ class QAP:
 
 def main():
     # получим объект файла
-    file1 = open("tai256c.txt", "r")
+    print()
+    fil = input("Введите название входного файла с матрицами: ")
+    file1 = open(f"{fil}.txt", "r")
     data_F = []
     data_D = []
 
@@ -109,9 +112,25 @@ def main():
     # print(data_F)
     # закрываем файл
     file1.close()
-    qap = QAP(data_D, data_F)
+
+    # начальный и максимальный размер популяции,
+    # минимальное и максимальное число семян,
+    # показатель уменьшения дисперсии,
+    # начальное и конечное значение стандартного отклонения
+    # количество итераций
+    maxIt = int(input("Количество итераций: "))
+    population_Size_Initial = int(input("Начальный размер популяции: "))
+    maximum_Population_Size = int(input("Максимальный размер популяции: "))
+    min_Seed = int(input("Минимальное число семян: "))
+    max_Seed = int(input("Максимальное число семян: "))
+    m = int(input("Показатель уменьшения дисперсии: "))
+    sigma_initial = int(input("Начальное значение стандартного отклонения:"))
+    sigma_final = int(input("Конечное значение стандартного отклонения:"))
+    qap = QAP(data_D, data_F, maxIt, population_Size_Initial,
+              maximum_Population_Size,min_Seed, max_Seed,
+              m, sigma_initial, sigma_final)
     qap.start()
-    #qap.stop()
+
 
 
 if __name__ == '__main__':
