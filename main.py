@@ -11,8 +11,8 @@ class QAP:
                  flows, maxIt = 20, population_Size_Initial = 20,
                  maximum_Population_Size = 20,min_Seed = 1, max_Seed = 3, m = 3, sigma_initial = 20, sigma_final = 0.5):
         # self.A = np.matrix(assignments) # Матрица стоимости назначений
-        self.D = np.matrix(distances)  # Матрица стоимости перевозки
-        self.F = np.matrix(flows)  # Количество единиц ресурса
+        self.D = np.matrix(distances, dtype=object)  # Матрица стоимости перевозки
+        self.F = np.matrix(flows, dtype=object)  # Количество единиц ресурса
         self.size = len(self.D)
         # IWO параметры
         self.maxIt = maxIt  # Максимальное количество итераций
@@ -29,9 +29,6 @@ class QAP:
     # Целевая функция
     def target_function(self, p):
         cost = 0
-        # for i in range(len(p)):  # i - объект, site - расположение
-        #     cost += self.A[p[i], i]  # Находим сумма стоимости расположений объекта
-        # f(i,j)*d(pi,pj)
         for i in range(1, len(p)):
             for j in range(i):
                 cost += self.F[i, j] * self.D[p[i], p[j]]
@@ -86,8 +83,8 @@ class QAP:
 
             # Исключаем слабых
             population = population[0:self.maximum_Population_Size]
-            # print(population[0:5])
             print("Итерация : " + str(t) + "    Лучшее " + str(population[0][0]) + str(population[0][1]))
+        print("Лучшее решение : " + str(population[0][0]) + " " + str(population[0][1]))
 
     def stop(self):
         print(self.target_function([7, 15, 13, 16, 3, 10, 2, 18, 6, 8, 0, 14, 5, 12, 9, 1, 4, 19, 17, 11]))
@@ -106,32 +103,24 @@ def main():
     file1.readline()
     for i in range(int(size)):
         data_F.append([int(x) for x in file1.readline().split()])
+    file1.readline()
     for i in range(int(size)):
         data_D.append([int(x) for x in file1.readline().split()])
-    # print(data_D)
-    # print(data_F)
     # закрываем файл
     file1.close()
 
-    # начальный и максимальный размер популяции,
-    # минимальное и максимальное число семян,
-    # показатель уменьшения дисперсии,
-    # начальное и конечное значение стандартного отклонения
-    # количество итераций
     maxIt = int(input("Количество итераций: "))
     population_Size_Initial = int(input("Начальный размер популяции: "))
     maximum_Population_Size = int(input("Максимальный размер популяции: "))
     min_Seed = int(input("Минимальное число семян: "))
     max_Seed = int(input("Максимальное число семян: "))
     m = int(input("Показатель уменьшения дисперсии: "))
-    sigma_initial = int(input("Начальное значение стандартного отклонения:"))
-    sigma_final = int(input("Конечное значение стандартного отклонения:"))
+    sigma_initial = float(input("Начальное значение стандартного отклонения:"))
+    sigma_final = float(input("Конечное значение стандартного отклонения:"))
     qap = QAP(data_D, data_F, maxIt, population_Size_Initial,
               maximum_Population_Size,min_Seed, max_Seed,
               m, sigma_initial, sigma_final)
     qap.start()
-
-
 
 if __name__ == '__main__':
     main()
